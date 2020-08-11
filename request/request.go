@@ -11,9 +11,9 @@ type webRequest struct {
 }
 
 type responseMap struct {
-	twoHundreds   int
-	threeHundreds int
-	fourHundreds  int
+	TwoHundreds   int
+	ThreeHundreds int
+	FourHundreds  int
 }
 
 func Fire(url, uri string, port, count int) (returnData responseMap) {
@@ -24,8 +24,6 @@ func Fire(url, uri string, port, count int) (returnData responseMap) {
 	for counter := 0; count > counter; counter++ {
 		reqData := renderRequest(url, uri, port)
 		var failedReq int = 0
-
-		fmt.Printf("Firing request #: %d out of %d \n", counter, count)
 
 		resp, err := http.Get(reqData)
 		if err != nil {
@@ -42,7 +40,7 @@ func Fire(url, uri string, port, count int) (returnData responseMap) {
 			fourHundreds++
 		}
 	}
-	returnData = responseMap{twoHundreds: twoHundreds, threeHundreds: threeHundreds, fourHundreds: fourHundreds}
+	returnData = responseMap{TwoHundreds: twoHundreds, ThreeHundreds: threeHundreds, FourHundreds: fourHundreds}
 
 	return returnData
 }

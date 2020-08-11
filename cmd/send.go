@@ -18,16 +18,18 @@ var sendCmd = &cobra.Command{
 		port, _ := cmd.Flags().GetInt("port")
 		count, _ := cmd.Flags().GetInt("count")
 		uri, _ := cmd.Flags().GetString("uri")
+		fmt.Println("Firing of requests, please hold...")
 		req := request.Fire(target, uri, port, count)
-		resultString := `================================
-    Final test results:
-    ===================
-    Number of requests sent: %s
-    Number of 200 OK responses: %s
-    Number of 300 responses: %s
-    Number of 400 errors: %s`
 
-		fmt.Println(resultString, req.twoHundreds, req.threeHundreds, req.fourHundreds)
+		fmt.Printf(`
+    ================================
+    Final test results:
+    ================================
+    Number of requests sent: %d
+    Number of 200 OK responses: %d
+    Number of 300 responses: %d
+    Number of 400 errors: %d
+    ================================`, count, req.TwoHundreds, req.ThreeHundreds, req.FourHundreds)
 	},
 }
 
