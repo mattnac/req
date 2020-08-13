@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/mattnac/req/request"
 	"github.com/spf13/cobra"
@@ -14,23 +16,43 @@ var sendCmd = &cobra.Command{
 	Long: `The send command is used to fire off a batch of requests to the
   specified target/port/uri combination.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		defer timeTrack(time.Now(), "testRun")
 		target, _ := cmd.Flags().GetString("target")
 		port, _ := cmd.Flags().GetInt("port")
 		count, _ := cmd.Flags().GetInt("count")
 		uri, _ := cmd.Flags().GetString("uri")
-		fmt.Println("Firing of requests, please hold...")
-		req := request.Fire(target, uri, port, count)
+		write, _ := cmd.Flags().GetBool("write")
 
-		fmt.Printf(`
-    ================================
-    Final test results:
-    ================================
-    Number of requests sent: %d
-    Number of 200 OK responses: %d
-    Number of 300 responses: %d
-    Number of 400 errors: %d
-    ================================`, count, req.TwoHundreds, req.ThreeHundreds, req.FourHundreds)
+		fmt.Println("Firing off requests, please hold...")
+		req := request.Fire(target, uri, port, count)
+		resultString := fmt.Sprintf(`
+================================
+Final test results:
+================================
+Number of requests sent: %d
+Number of 200 OK responses: %d
+Number of 300 responses: %d
+Number of 400 errors: %d
+================================`, count, req.TwoHundreds, req.ThreeHundreds, req.FourHundreds)
+		if write {
+			f, err := os.Create("/tmp/test-report.txt")
+			if err != nil {
+				panic(err)
+			}
+			defer f.Close()
+
+			f.WriteString(resultString)
+			f.Sync()
+			fmt.Println("Results written to", f.Name())
+		} else {
+			fmt.Printf(resultString)
+		}
 	},
+}
+
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	fmt.Printf("\nExecution time: %s\n", elapsed)
 }
 
 func init() {
@@ -40,4 +62,5 @@ func init() {
 	sendCmd.Flags().StringP("uri", "u", "/", "The URI to hit, defaults to /")
 	sendCmd.Flags().Int("port", 80, "Target port number.")
 	sendCmd.Flags().Int("count", 1, "Number of requests to fire off.")
+	sendCmd.Flags().BoolP("write", "w", false, "Add this flag to write report to a file.")
 }

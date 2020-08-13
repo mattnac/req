@@ -28,7 +28,7 @@ func Fire(url, uri string, port, count int) (returnData responseMap) {
 		resp, err := http.Get(reqData)
 		if err != nil {
 			failedReq++
-			fmt.Println("Error:", err)
+			fmt.Printf("Request number: %d failed with error %s", count, err)
 			continue
 		}
 		defer resp.Body.Close()
