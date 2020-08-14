@@ -16,16 +16,23 @@ var sendCmd = &cobra.Command{
 	Long: `The send command is used to fire off a batch of requests to the
   specified target/port/uri combination.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		defer timeTrack(time.Now(), "testRun")
-		target, _ := cmd.Flags().GetString("target")
-		port, _ := cmd.Flags().GetInt("port")
-		count, _ := cmd.Flags().GetInt("count")
-		uri, _ := cmd.Flags().GetString("uri")
-		write, _ := cmd.Flags().GetBool("write")
+		sendReq(cmd)
+	},
+}
 
-		fmt.Println("Firing off requests, please hold...")
-		req := request.Fire(target, uri, port, count)
-		resultString := fmt.Sprintf(`
+func sendReq(cmd *cobra.Command) {
+	start := time.Now()
+
+	target, _ := cmd.Flags().GetString("target")
+	port, _ := cmd.Flags().GetInt("port")
+	count, _ := cmd.Flags().GetInt("count")
+	uri, _ := cmd.Flags().GetString("uri")
+	write, _ := cmd.Flags().GetBool("write")
+
+	fmt.Println("Firing off requests, please hold...")
+	req := request.Fire(target, uri, port, count)
+	elapsed := time.Since(start)
+	resultString := fmt.Sprintf(`
 ================================
 Final test results:
 ================================
@@ -33,26 +40,21 @@ Number of requests sent: %d
 Number of 200 OK responses: %d
 Number of 300 responses: %d
 Number of 400 errors: %d
-================================`, count, req.TwoHundreds, req.ThreeHundreds, req.FourHundreds)
-		if write {
-			f, err := os.Create("/tmp/test-report.txt")
-			if err != nil {
-				panic(err)
-			}
-			defer f.Close()
+Execution time: %dms
+================================`, count, req.TwoHundreds, req.ThreeHundreds, req.FourHundreds, elapsed.Milliseconds())
 
-			f.WriteString(resultString)
-			f.Sync()
-			fmt.Println("Results written to", f.Name())
-		} else {
-			fmt.Printf(resultString)
+	if write {
+		f, err := os.Create("/tmp/test-report.txt")
+		if err != nil {
+			panic(err)
 		}
-	},
-}
-
-func timeTrack(start time.Time, name string) {
-	elapsed := time.Since(start)
-	fmt.Printf("\nExecution time: %s\n", elapsed)
+		defer f.Close()
+		f.WriteString(resultString)
+		f.Sync()
+		fmt.Println("Results written to", f.Name())
+	} else {
+		fmt.Printf(resultString)
+	}
 }
 
 func init() {
