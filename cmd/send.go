@@ -21,13 +21,14 @@ var sendCmd = &cobra.Command{
 }
 
 func sendReq(cmd *cobra.Command) {
-	start := time.Now()
 
 	target, _ := cmd.Flags().GetString("target")
 	port, _ := cmd.Flags().GetInt("port")
 	count, _ := cmd.Flags().GetInt("count")
 	uri, _ := cmd.Flags().GetString("uri")
 	write, _ := cmd.Flags().GetBool("write")
+
+	start := time.Now()
 
 	fmt.Println("Firing off requests, please hold...")
 	req := request.Fire(target, uri, port, count)
