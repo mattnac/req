@@ -3,7 +3,6 @@ package request
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 )
 
 type webRequest struct {
@@ -17,9 +16,11 @@ type responseMap struct {
 }
 
 func Fire(url, uri string, port, count int) (returnData responseMap) {
-	var twoHundreds int = 0
-	var threeHundreds int = 0
-	var fourHundreds int = 0
+	var (
+		twoHundreds   = 0
+		threeHundreds = 0
+		fourHundreds  = 0
+	)
 
 	for counter := 0; count > counter; counter++ {
 		reqData := renderRequest(url, uri, port)
@@ -46,8 +47,7 @@ func Fire(url, uri string, port, count int) (returnData responseMap) {
 }
 
 func renderRequest(url, uri string, port int) (reqUrl string) {
-	webPort := strconv.Itoa(port)
-	fullUrl := webRequest{url: "https://" + url + ":" + webPort + uri}
+	fullUrl := webRequest{url: fmt.Sprintf("https://%s:%d/%s", url, port, uri)}
 
 	return fullUrl.url
 }
