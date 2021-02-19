@@ -27,11 +27,12 @@ func sendReq(cmd *cobra.Command) {
 	count, _ := cmd.Flags().GetInt("count")
 	uri, _ := cmd.Flags().GetString("uri")
 	write, _ := cmd.Flags().GetBool("write")
+	insecure, _ := cmd.Flags().GetBool("insecure")
 
 	start := time.Now()
 
 	fmt.Println("Firing off requests, please hold...")
-	req := request.Fire(target, uri, port, count)
+	req := request.Fire(target, uri, port, count, insecure)
 	elapsed := time.Since(start)
 	resultString := fmt.Sprintf(`
 ================================
@@ -66,4 +67,5 @@ func init() {
 	sendCmd.Flags().Int("port", 80, "Target port number.")
 	sendCmd.Flags().Int("count", 1, "Number of requests to fire off.")
 	sendCmd.Flags().BoolP("write", "w", false, "Add this flag to write report to a file.")
+	sendCmd.Flags().BoolP("insecure", "i", false, "This flag disregards certificate checks.")
 }

@@ -1,6 +1,7 @@
 package request
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 )
@@ -15,7 +16,7 @@ type responseMap struct {
 	FourHundreds  int
 }
 
-func Fire(url, uri string, port, count int) (returnData responseMap) {
+func Fire(url, uri string, port, count int, insecure bool) (returnData responseMap) {
 	var (
 		twoHundreds   = 0
 		threeHundreds = 0
@@ -25,6 +26,10 @@ func Fire(url, uri string, port, count int) (returnData responseMap) {
 	for counter := 0; count > counter; counter++ {
 		reqData := renderRequest(url, uri, port)
 		var failedReq int = 0
+
+		//if insecure = true {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		//}
 
 		resp, err := http.Get(reqData)
 		if err != nil {
